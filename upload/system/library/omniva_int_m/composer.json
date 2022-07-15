@@ -1,0 +1,16 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Mijora\\OmnivaIntOpencart\\": "src/"
+        }
+    },
+    "require": {
+        "omniva/api-lib": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:mijora/omniva-api.git"
+        }
+    ]
+}

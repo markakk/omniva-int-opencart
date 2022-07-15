@@ -1,0 +1,54 @@
+@keyframes bs5-spinner-border {
+    100% { transform: rotate(360deg) }
+}
+
+.loading {
+    position: relative;
+    overflow: hidden !important;
+    --loader-size: 2em;
+    --loader-weight: 0.25em;
+}
+
+.omniva_int_m_loader {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.5);
+    color: #ff6601;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading > .omniva_int_m_loader {
+    display: flex;
+}
+
+.bs5-spinner-border {
+    display: inline-block;
+    width: var(--loader-size, 1em);
+    height: var(--loader-size, 1em);
+    border: var(--loader-weight, 0.15em) solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: .75s linear infinite bs5-spinner-border;
+    animation: 0.75s linear infinite bs5-spinner-border;
+}
+
+/* Overrides for terminal mapping */
+.omniva-int-m-tmjs.tmjs-container {
+    padding: 1em 1.5em;
+}
+.omniva-int-m-tmjs.tmjs-container .tmjs-selected-terminal {
+    padding-bottom: 0.5em;
+    font-size: 1em;
+}
+.omniva-int-m-tmjs.tmjs-container .tmjs-open-modal-btn {
+    padding: 0.5em 1.0em;
+    font-size: 1em;
+}
+.omniva-int-m-tmjs.tmjs-container .tmjs-open-modal-btn:hover,
+.omniva-int-m-tmjs.tmjs-container .tmjs-open-modal-btn:focus {
+    color: #fff;
+    background-color: hsl(33deg 98% 45%);
+}

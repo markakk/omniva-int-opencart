@@ -1,0 +1,125 @@
+<div id="omniva_int_m-panel" class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			<i class="fa fa-info-circle"></i>
+			{{ omniva_int_m_panel_title }}
+		</h3>
+	</div>
+	<div class="panel-body">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">{{ omniva_int_m_panel_label_status }}</label>
+                <div class="col-sm-8">
+                    <pre>{{ shipment_status }}</pre>
+                </div>
+            </div>
+
+            {% if api_data %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">{{ omniva_int_m_panel_label_manifest_id }}</label>
+                    <div class="col-sm-4">
+                        <pre>{{ api_data.manifest_id }}</pre>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">{{ omniva_int_m_panel_label_shipment_id }}</label>
+                    <div class="col-md-4">
+                        <pre>{{ api_data.shipment_id }}</pre>
+                    </div>
+                    <div class="col-md-4">
+                        {% if label_status %}
+                        <button data-get-label-btn="{{ api_data.shipment_id }}" class="btn btn-default">{{ omniva_int_m_panel_btn_get_label }}</button>
+                        {% else %}
+                        <button data-get-label-btn="{{ api_data.shipment_id }}" class="btn btn-default">{{ omniva_int_m_panel_btn_check_status }}</button>
+                        {% endif %}
+                        <button data-cancel-shipment-btn="{{ api_data.shipment_id }}" data-warning="{{ omniva_int_m_panel_warning_cancel|escape }}" class="btn btn-danger">{{ omniva_int_m_panel_btn_cancel_shipment }}</button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if label_status and label_status.tracking_numbers %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <caption>{{ omniva_int_m_panel_table_caption_tracking_numbers }}</caption>
+                <thead>
+                    <tr>
+                        <th>{{ omniva_int_m_panel_table_col_tracking_number }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tracking in label_status.tracking_numbers %}
+                    <tr>
+                        <td>{{ tracking }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if is_terminal %}
+        <div class="form-horizontal">
+            <input type="hidden" name="api_url" value="{{ api_url }}">
+            <input type="hidden" name="select_terminal" value="{{ omniva_int_m_panel_warning_select_terminal|escape }}">
+            <div class="form-group" 
+                data-terminal data-terminal-postcode="{{ order.shipping_postcode }}" 
+                data-terminal-country="{{ order.shipping_iso_code_2 }}"
+                data-terminal-identifier="{{ offer.parcel_terminal_type }}"
+                data-terminal-selected="{{ terminal_id }}"
+            >
+                <label class="col-sm-2 control-label">{{ omniva_int_m_panel_label_selected_terminal }}</label>
+                <div class="col-sm-8" data-terminal-selector-wrapper>
+                    {% if terminal_id %}
+                    <pre>{{ terminal_id }} - {{ terminal_data.name }}, {{ terminal_data.address }}</pre>
+                    {% else %}
+                    <pre>{{ omniva_int_m_panel_warning_select_terminal }}</pre>
+                    {% endif %}
+                </div>
+                <div class="col-sm-2">
+                    {% if not api_data %}
+                    <button class="btn btn-default"
+                        data-terminal-change-btn="edit" 
+                        data-text-change="{{ omniva_int_m_generic_btn_change }}" 
+                        data-text-save="{{ omniva_int_m_generic_btn_save }}"
+                    >{{ omniva_int_m_generic_btn_change }}</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <caption>{{ omniva_int_m_panel_table_caption_parcels_info }}</caption>
+                <thead>
+                    <tr>
+                        <th>{{ omniva_int_m_panel_table_col_amount }}</th>
+                        <th>{{ omniva_int_m_panel_table_col_weight }}</th>
+                        <th>{{ omniva_int_m_panel_table_col_width }}</th>
+                        <th>{{ omniva_int_m_panel_table_col_length }}</th>
+                        <th>{{ omniva_int_m_panel_table_col_height }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parcel in parcels %}
+                    <tr>
+                        <td>{{ parcel.amount }}</td>
+                        <td>{{ parcel.weight }}</td>
+                        <td>{{ parcel.x }}</td>
+                        <td>{{ parcel.y }}</td>
+                        <td>{{ parcel.z }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div data-api-response></div>
+	</div>
+    {% if not api_data %}
+    <div class="panel-footer">
+        <button data-register-shipment-btn class="btn btn-success">{{ omniva_int_m_panel_btn_register_shipment }}</button> 
+    </div>
+    {% endif %}
+</div>

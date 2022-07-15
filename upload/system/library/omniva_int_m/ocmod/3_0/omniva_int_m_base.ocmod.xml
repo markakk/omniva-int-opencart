@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Omniva International Base Mod for OC3</name>
+    <version>0.0.16</version>
+    <author>Mijora</author>
+    <link>https://www.mijora.lt</link>
+    <code>omniva_int_m_base</code>
+
+    <!-- ADMIN -->
+
+    <file path="admin/controller/common/column_left.php">
+        <operation>
+            <search><![CDATA[$marketplace = array();]]></search>
+            <add position="after"><![CDATA[
+                /* OMNIVA_INT_M ADMIN MENU */
+                $this->load->language('extension/shipping/omniva_int_m');
+                $omniva_int_m = [];
+                if ($this->user->hasPermission('access', 'extension/shipping/omniva_int_m')) {
+                    $omniva_int_m[] = array(
+                        'name'     => $this->language->get('omniva_int_m_menu_settings'),
+                        'href'     => $this->url->link('extension/shipping/omniva_int_m', 'user_token=' . $this->session->data['user_token'], true),
+                        'children' => []
+                    );
+                }
+
+                if ($this->user->hasPermission('access', 'extension/shipping/omniva_int_m')) {
+                    $omniva_int_m[] = array(
+                        'name'     => $this->language->get('omniva_int_m_menu_manifest'),
+                        'href'     => $this->url->link('extension/shipping/omniva_int_m/manifest', 'user_token=' . $this->session->data['user_token'], true),
+                        'children' => []
+                    );
+                }
+
+                if (!empty($omniva_int_m) && $this->user->hasPermission('access', 'extension/shipping/omniva_int_m')) {
+                    $marketplace[] = array(
+                        'name'     => $this->language->get('omniva_int_m_menu_head'),
+                        'href'     => '',
+                        'children' => $omniva_int_m
+                    );
+                }
+                /* OMNIVA_INT_M END */
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[$this->response->setOutput($this->load->view('sale/order_info', $data));]]></search>
+            <add position="before"><![CDATA[
+                /* OMNIVA_INT_M */
+                $data['omniva_int_m_order'] = strpos($order_info['shipping_code'], 'omniva_int_m.') === 0; // show only for orders with omniva_int_m shipping method
+                $data['omniva_int_m_ajax'] = 'index.php?route=extension/shipping/omniva_int_m/ajax&user_token=' . $this->session->data['user_token'];
+                /* OMNIVA_INT_M END */
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/view/template/sale/order_info.twig" error="log">
+        <operation>
+        <search><![CDATA[{{ footer }}]]></search>
+            <add position="before"><![CDATA[
+                <!-- OMNIVA_INT_M -->
+                {% if omniva_int_m_order %}
+                    <link rel="stylesheet" href="view/javascript/omniva_int_m/select2.min.css">
+                    <link rel="stylesheet" href="view/javascript/omniva_int_m/select2_bs3.css">
+                    <link rel="stylesheet" href="view/javascript/omniva_int_m/admin.css">
+                    <script>
+                        var OMNIVA_INT_M_ORDER_DATA = {
+                            ajax: '{{ omniva_int_m_ajax }}',
+                            order_id: '{{ order_id }}'
+                        };
+                    </script>
+                    <script src="view/javascript/omniva_int_m/select2.min.js?20220426" type="text/javascript"></script>
+                    <script src="view/javascript/omniva_int_m/common.js?20220426" type="text/javascript"></script>
+                    <script src="view/javascript/omniva_int_m/order.js?20220426" type="text/javascript"></script>
+                {% endif %}
+                <!-- OMNIVA_INT_M END -->
+            ]]></add>
+        </operation>
+    </file>
+
+    <!-- API -->
+
+    <file path="catalog/controller/api/order.php" error="log">
+        <operation>
+        <search><![CDATA[$this->model_checkout_order->editOrder($order_id, $order_data);]]></search>
+            <add position="before"><![CDATA[
+                /* OMNIVA_INT_M */
+                if (isset($this->session->data['shipping_method']) && strpos($this->session->data['shipping_method']['code'], 'omniva_int_m.') === 0) {
+                    $this->load->model('extension/shipping/omniva_int_m');
+                    $this->model_extension_shipping_omniva_int_m->updateOrderInformation($order_id);
+				}
+                /* OMNIVA_INT_M END */
+            ]]></add>
+        </operation>
+    </file>
+
+    <!-- Front -->
+    <file path="catalog/controller/checkout/success.php" error="log">
+        <operation>
+        <search><![CDATA[$this->cart->clear();]]></search>
+            <add position="after"><![CDATA[
+                /* OMNIVA_INT_M */
+                if (isset($this->session->data['shipping_method']) && strpos($this->session->data['shipping_method']['code'], 'omniva_int_m.') === 0) {
+                    $this->load->model('extension/shipping/omniva_int_m');
+                    $this->model_extension_shipping_omniva_int_m->saveOrderInformation();
+				}
+                /* OMNIVA_INT_M END */
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="catalog/controller/checkout/checkout.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[$this->document->addStyle('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css');]]></search>
+            <add position="after"><![CDATA[
+                // OMNIVA_INT_M
+                $omniva_int_m_status = $this->config->get('shipping_omniva_int_m_status');
+
+                $data['omniva_int_m_checkout_partial'] = '';
+                if ($omniva_int_m_status) {
+                    $this->document->addStyle('catalog/view/javascript/omniva_int_m/front.css?20220429');
+
+                    $this->document->addScript('catalog/view/javascript/omniva_int_m/common.js?20220429');
+                    $this->document->addScript('catalog/view/javascript/omniva_int_m/front.js?20220429');
+
+                    $omniva_int_m_data = [
+                        'omniva_int_m_ajax' => $this->url->link('extension/module/omniva_int_m/ajax')
+                    ];
+
+                    $this->load->model('extension/shipping/omniva_int_m');
+                    $omniva_int_m_data = array_merge($omniva_int_m_data, $this->model_extension_shipping_omniva_int_m->getFrontData());
+
+                    $data['omniva_int_m_checkout_partial'] = $this->load->view('extension/module/omniva_int_m/checkout_partial', $omniva_int_m_data);
+                }
+                // OMNIVA_INT_M END    
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="catalog/view/theme/default/template/checkout/checkout.twig" error="log">
+        <operation>
+            <search><![CDATA[{{ footer }}]]></search>
+            <add position="before"><![CDATA[
+                <!-- OMNIVA_INT_M -->
+                {{ omniva_int_m_checkout_partial }}
+                <!-- OMNIVA_INT_M END -->
+            ]]></add>
+        </operation>
+        
+        <operation>
+            <search><![CDATA[$(document).delegate('#button-shipping-method', 'click', function() {]]></search>
+            <add position="after"><![CDATA[
+                /* OMNIVA_INT_M */
+                if (typeof OMNIVA_INT_M_FRONT === 'object' && !OMNIVA_INT_M_FRONT.isValidTerminalSelection()) {
+                    return;
+                }
+                /* OMNIVA_INT_M END */
+            ]]></add>
+        </operation>
+    </file>
+</modification>

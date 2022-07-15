@@ -1,0 +1,25 @@
+{% for omniva_int_option in omniva_int_options %}
+    <tr data-shipping-method-id="{{ omniva_int_option.id }}">
+        <td>{{ omniva_int_option.id }}</td>
+        <td>{{ omniva_int_option.title }}</td>
+        <td>{{ dynamic_strings[omniva_int_option.getTypeTranslationString()] }}</td>
+        <td>{{ omniva_int_option.allowed_services }}</td>
+        <td>{{ dynamic_strings[omniva_int_option.getOfferPriorityTranslationString()] }}</td>
+        <td>{{ omniva_int_option.sort_order }}</td>
+        <td>
+            {% if omniva_int_option.enabled %}
+                <span class="service-enabled"></span>
+            {% else %}
+                <span class="service-disabled"></span>
+            {% endif %}
+        </td>
+        <td>
+            <button class="btn btn-default" data-btn-add-option data-shipping-method-id="{{ omniva_int_option.id }}">{{ omniva_int_m_sm_table_btn_edit }}</button>
+            <button class="btn btn-danger" data-btn-delete-option data-shipping-method-id="{{ omniva_int_option.id }}"><i class="fa fa-trash"></i></button>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="8" class="text-center">{{ omniva_int_m_sm_table_no_options }}</td>
+    </tr>
+{% endfor %}

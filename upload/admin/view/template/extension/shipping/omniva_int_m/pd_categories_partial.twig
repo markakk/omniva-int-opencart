@@ -1,0 +1,35 @@
+{% for pd_category in omniva_int_m_categories %}
+    <tr>
+        <td>{{ pd_category.category_id }}</td>
+        <td>{{ pd_category.name }}</td>
+        <td>
+            {% if pd_category.default_data %}
+                <span class="service-enabled"></span>
+            {% else %}
+                <span class="service-disabled"></span>
+            {% endif %}
+        </td>
+        <td>
+            <button type="button" class="btn btn-default edit-pd-category"
+                data-category="{{ pd_category.category_id }}"
+                data-category-name="{{ pd_category.name }}"
+                
+                {% if pd_category.default_data %}
+                    data-has-defaults="true"
+                {% else %}
+                    data-has-defaults="false"
+                {% endif %}
+
+                {% for key, default_data in pd_category.default_data.getAllValues() %}
+                data-{{ key }}="{{ default_data }}"
+                {% endfor %}
+            >{{ omniva_int_m_pd_btn_edit }}</button>
+            
+            {% if pd_category.default_data %}
+            <button type="button" class="btn btn-default reset-pd-category"
+                data-category="{{ pd_category.category_id }}"
+            >{{ omniva_int_m_pd_btn_reset }}</button>
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}

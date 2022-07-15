@@ -1,0 +1,33 @@
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <caption>{{ omniva_int_m_manifest_caption }}</caption>
+        <thead>
+            <tr>
+                <th>{{ omniva_int_m_manifest_table_col_manifest_id }}</th>
+                <th>{{ omniva_int_m_manifest_table_col_order_count }}</th>
+                <th>{{ omniva_int_m_manifest_table_col_actions }}</th>
+            </tr>
+        </thead>
+        <tbody id="manifests-list">
+            {% for manifest in manifests %}
+            <tr>
+                <td>{{ manifest.manifest_id }}</td>
+                <td>{{ manifest.total_orders }}</td>
+                <td>
+                    <button data-print-manifest="{{ manifest.manifest_id }}" data-warning="{{ omniva_int_m_manifest_warning_btn_print }}" class="btn btn-default">{{ omniva_int_m_manifest_btn_print }}</button>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">{{ omniva_int_m_manifest_table_empty }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <div id="pagination" class="col-sm-12 text-center">
+        {{ paginator }}
+    </div>
+</div>

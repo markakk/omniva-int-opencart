@@ -1,0 +1,641 @@
+{{ header }}
+{{ column_left }}
+
+<div id="content" class="omniva_int_m_content loading">
+    <div class="page-header">
+        <div class="container-fluid">
+            <h1><img src="view/image/omniva_int_m/logo.png" alt="Omniva Logo" style="height: 33px;"></h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %}
+            </ul>
+            <span class="omniva-version">v{{ omniva_int_m_version }}</span>
+        </div>
+    </div>
+
+    <!-- Errors / Success -->
+    <div class="container-fluid">
+        {% if error_warning %}
+        <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endif %}
+        {% if success %}
+        <div class="alert alert-success"><i class="fa fa-exclamation-circle"></i>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ success }}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- VERSION CHECK -->
+    {% if omniva_int_m_git_version %}
+    <div class="container-fluid">
+        <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ omniva_int_m_new_version_notify|replace({'$$omniva_int_m_new_version$$': omniva_int_m_git_version.version}) }} 
+            <a href="{{ omniva_int_m_git_version.download_url }}" target="_blank" class="btn btn-success">{{ omniva_int_m_button_download_version }}</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- DB CHECK -->
+    {% if omniva_int_m_db_check %}
+    <div class="container-fluid">
+        <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ omniva_int_m_db_fix_notify }} 
+            <a href="{{ omniva_int_m_db_fix_url }}" class="btn btn-success">{{ omniva_int_m_button_fix_db }}</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- XML CHECK -->
+    {% if omniva_int_m_xml_check %}
+    <div class="container-fluid">
+        <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ omniva_int_m_xml_fix_notify }} 
+            <a href="{{ omniva_int_m_xml_fix_url }}" class="btn btn-success">{{ omniva_int_m_button_fix_xml }}</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <ul class="container-fluid nav nav-tabs">
+        <li class="active"><a href="#tab-general" data-toggle="tab">{{ omniva_int_m_tab_general }}</a></li>
+        <li><a href="#tab-api" data-toggle="tab">{{ omniva_int_m_tab_api }}</a></li>
+        <li><a href="#tab-shipping-method" data-toggle="tab">{{ omniva_int_m_tab_shipping_method }}</a></li>
+        <li><a href="#tab-services" data-toggle="tab">{{ omniva_int_m_tab_services }}</a></li>
+        <li><a href="#tab-sender-info" data-toggle="tab">{{ omniva_int_m_tab_sender_info }}</a></li>
+        <li><a href="#tab-parcel-defaults" data-toggle="tab">{{ omniva_int_m_tab_parcel_defaults }}</a></li>
+        {# {% if required_settings_set %}
+            <li><a href="#tab-price" data-toggle="tab">{{ omniva_int_m_tab_price }}</a></li>
+            <li><a href="#tab-cod" data-toggle="tab">{{ omniva_int_m_tab_cod }}</a></li>
+            <li><a href="#tab-terminals" data-toggle="tab">{{ omniva_int_m_tab_terminals }}</a></li>
+            <li><a href="#tab-tracking-email" data-toggle="tab">{{ omniva_int_m_tab_tracking_email }}</a></li>
+            <li class="hidden"><a href="#tab-advanced" data-toggle="tab">{{ omniva_int_m_tab_advanced }}</a></li>
+        {% else %}
+            <li><div class="alert alert-danger">{{ omniva_int_m_alert_settings }}</div></li>
+        {% endif %} #}
+    </ul>
+
+    <div class="tab-content">
+        <!-- Module Settings -->
+        <div class="tab-pane active" id="tab-general">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ omniva_int_m_title_edit }}</h3>
+                </div>
+                <div class="panel-body">
+                    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-omniva_int_m" class="form-horizontal">
+                    <input type="hidden" name="module_settings_update">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-tax-class">{{ omniva_int_m_label_tax_class }}</label>
+                        <div class="col-sm-10">
+                        <select name="omniva_int_m_tax_class_id" id="input-tax-class" class="form-control">
+                            <option value="0">{{ text_none }}</option>
+                            {% for tax_class in tax_classes %}
+                            {% if tax_class['tax_class_id'] == omniva_int_m_tax_class_id %}
+                                <option value="{{ tax_class['tax_class_id'] }}" selected="selected">{{ tax_class['title'] }}</option>
+                            {% else %}
+                                <option value="{{ tax_class['tax_class_id'] }}">{{ tax_class['title'] }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-geo-zone">{{ omniva_int_m_label_geo_zone }}</label>
+                        <div class="col-sm-10">
+                        <select name="omniva_int_m_geo_zone_id" id="input-geo-zone" class="form-control">
+                            <option value="0">{{ text_all_zones }}</option>
+                            {% for geo_zone in geo_zones %}
+                            {% if geo_zone['geo_zone_id'] == omniva_int_m_geo_zone_id %}
+                                <option value="{{ geo_zone['geo_zone_id'] }}" selected="selected">{{ geo_zone['name'] }}</option>
+                            {% else %}
+                                <option value="{{ geo_zone['geo_zone_id'] }}">{{ geo_zone['name'] }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-status">{{ omniva_int_m_label_status }}</label>
+                        <div class="col-sm-10">
+                        <select name="omniva_int_m_status" id="input-status" class="form-control">
+                            {% if omniva_int_m_status %}
+                            <option value="1" selected="selected">{{ text_enabled }}</option>
+                            <option value="0">{{ text_disabled }}</option>
+                            {% else %}
+                            <option value="1">{{ text_enabled }}</option>
+                            <option value="0" selected="selected">{{ text_disabled }}</option>
+                            {% endif %}
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-sort-order">{{ omniva_int_m_label_sort_order }}</label>
+                        <div class="col-sm-10">
+                        <input type="text" name="omniva_int_m_sort_order" value="{{ omniva_int_m_sort_order }}" id="input-sort-order" class="form-control" />
+                        </div>
+                    </div>
+                    </form>
+                </div>
+
+                <div class="panel-footer clearfix">
+                    <div class="pull-right">
+                    <button type="submit" form="form-omniva_int_m" data-toggle="tooltip" title="{{ omniva_int_m_generic_btn_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                    <a href="{{ cancel }}" data-toggle="tooltip" title="{{ omniva_int_m_generic_btn_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Settings -->
+        <div class="tab-pane" id="tab-api">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-cogs"></i> {{ omniva_int_m_title_api_settings }}</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-omniva_int_m-api" class="form-horizontal">
+                            <input type="hidden" name="api_settings_update">
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-api-token">{{ omniva_int_m_label_api_token }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="omniva_int_m_api_token" value="{{ omniva_int_m_api_token }}" id="input-api-token" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-api-test-mode">{{ omniva_int_m_label_api_test_mode }}</label>
+                                <div class="col-sm-10">
+                                    <select name="omniva_int_m_api_test_mode" id="input-api-test-mode" class="form-control">
+                                        <option value="0">{{ omniva_int_m_generic_no }}</option>
+                                        <option value="1" {% if omniva_int_m_api_test_mode == 1 %}selected{% endif %}>{{ omniva_int_m_generic_yes }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="panel-footer clearfix">
+                        <div class="pull-right">
+                            <button type="submit" form="form-omniva_int_m-api" data-toggle="tooltip" title="{{ omniva_int_m_generic_btn_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                            <a href="{{ cancel }}" data-toggle="tooltip" title="{{ omniva_int_m_generic_btn_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sender Settings -->
+        {{ sender_tab_partial }}
+
+        <!-- Shipping methods -->
+        <div class="tab-pane" id="tab-shipping-method">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-heading heading-shipping-method">
+                        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ omniva_int_m_title_shipping_method_settings }}</h3>
+                        <button data-btn-add-option class="btn btn-success add-shipping-method-btn">+</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{{ omniva_int_m_sm_table_id }}</th>
+                                        <th>{{ omniva_int_m_sm_table_title }}</th>
+                                        <th>{{ omniva_int_m_sm_table_type }}</th>
+                                        <th>{{ omniva_int_m_sm_table_allowed_services }}</th>
+                                        <th>{{ omniva_int_m_sm_table_offer_priority }}</th>
+                                        <th>{{ omniva_int_m_sm_table_sort_order }}</th>
+                                        <th>{{ omniva_int_m_sm_table_enabled }}</th>
+                                        <th>{{ omniva_int_m_sm_table_actions }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shipping_options">
+                                    {{ omniva_int_shipping_options }}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Services -->
+        <div class="tab-pane" id="tab-services">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ omniva_int_m_title_services_settings }}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        {# <th>{{ omniva_int_m_service_table_id }}</th> #}
+                                        <th>{{ omniva_int_m_service_table_code }}</th>
+                                        <th>{{ omniva_int_m_service_table_name }}</th>
+                                        <th>{{ omniva_int_m_service_table_type }}</th>
+                                        <th>{{ omniva_int_m_service_table_logo }}</th>
+                                        <th>{{ omniva_int_m_service_table_pickup }}</th>
+                                        <th>{{ omniva_int_m_service_table_delivery }}</th>
+                                        <th>{{ omniva_int_m_service_table_terminal_type }}</th>
+                                        <th>{{ omniva_int_m_service_table_additional_services }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="available_services">
+                                {% for service in services %}
+                                    <tr>
+                                        {# <td>{{ service.get('id') }}</td> #}
+                                        <td>{{ service.get('service_code') }}</td>
+                                        <td>{{ service.get('name') }}</td>
+                                        <td>{{ service.get('service_type') }}</td>
+                                        <td><img height="30" src="{{ service.get('image') }}" alt=""></td>
+                                        <td class="text-center">
+                                            {% if service.get('pickup_from_address') %}
+                                                <span class="service-enabled"></span>
+                                            {% else %}
+                                                <span class="service-disabled"></span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if service.get('delivery_to_address') %}
+                                                <span class="service-enabled"></span>
+                                            {% else %}
+                                                <span class="service-disabled"></span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">{{ service.get('parcel_terminal_type') }}</td>
+                                        <td class="additional-services">
+                                            {% for additional_service, active in service.getAdditionalServices() %}
+                                                <span class="service-{% if active %}enabled{% else %}disabled{% endif %}">{{ additional_service }}</span>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parcel Defaults -->
+        <div class="tab-pane" id="tab-parcel-defaults">
+            <div class="container-fluid">
+                <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i>
+                    {{ omniva_int_m_description_parcel_defaults }}
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-cogs"></i> {{ omniva_int_m_title_parcel_defaults }}</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+
+                            <input type="hidden" name="omniva_int_m_pd_category_id" id="input-pd-category-id" value="{{ global_parcel_default.category_id }}">
+
+                            <div class="alert alert-info"><i class="fa fa-exclamation-circle"></i>
+                                {{ omniva_int_m_help_parcel_defaults }}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-pd-hs-code">{{ omniva_int_m_label_pd_hs_code }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="omniva_int_m_pd_hs_code" value="{{ global_parcel_default.hs_code }}" id="input-pd-hs-code" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-pd-weight">{{ omniva_int_m_label_pd_weight }}</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" name="omniva_int_m_pd_weight" value="{{ global_parcel_default.weight }}" id="input-pd-weight" class="form-control" />
+                                        <span class="input-group-addon">kg</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group pd-dimensions">
+                                <label class="col-sm-2 control-label" for="input-pd-length">{{ omniva_int_m_label_pd_dimensions }}</label>
+                                <div class="col-sm-10">
+                                    <div class="row">
+                                        <label class="col-sm-2 control-label" for="input-pd-length">{{ omniva_int_m_label_pd_length }}</label>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <input type="text" name="omniva_int_m_pd_length" value="{{ global_parcel_default.length }}" id="input-pd-length" class="form-control" />
+                                                <span class="input-group-addon">cm</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <label class="col-sm-2 control-label" for="input-pd-width">{{ omniva_int_m_label_pd_width }}</label>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <input type="text" name="omniva_int_m_pd_width" value="{{ global_parcel_default.width }}" id="input-pd-width" class="form-control" />
+                                                <span class="input-group-addon">cm</span>
+                                            </div>
+                                        </div>
+
+                                        <label class="col-sm-2 control-label" for="input-pd-height">{{ omniva_int_m_label_pd_height }}</label>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <input type="text" name="omniva_int_m_pd_height" value="{{ global_parcel_default.height }}" id="input-pd-height" class="form-control" />
+                                                <span class="input-group-addon">cm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-12 text-center">
+                                    <button type="button" class="btn btn-default save-global-dimensions">{{ omniva_int_m_generic_btn_save }}</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{{ omniva_int_m_pd_table_id }}</th>
+                                        <th>{{ omniva_int_m_pd_table_name }}</th>
+                                        <th>{{ omniva_int_m_pd_table_has_custom_defaults }}</th>
+                                        <th>{{ omniva_int_m_pd_table_action }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pd-categories">
+                                    {{ pd_categories_partial }}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row">
+                            <div id="omniva_int_m_pd_pagination" class="col-sm-12 text-center">
+                                {{ pd_categories_paginator }}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- Content panel -->
+
+    <!-- Service Create/Edit Modal -->
+    <div class="omniva-int-m-modal hidden options-hidden" id="shipping_option_modal">
+        <div class="panel panel-default">
+            
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ omniva_int_m_sm_modal_title }}</h3>
+            </div>
+
+            <div class="panel-body form-horizontal">
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ omniva_int_m_label_sm_modal_enabled }}</label>
+                    <div class="col-sm-4">
+                        <select name="option_enabled" class="form-control">
+                            <option value="0" selected>{{ omniva_int_m_generic_no }}</option>
+                            <option value="1">{{ omniva_int_m_generic_yes }}</option>
+                        </select>
+                    </div>
+                    <label class="col-sm-2 control-label" for="sm-option-sort-order">{{ omniva_int_m_label_sm_modal_sort_order }}</label>
+                    <div class="col-sm-4">
+                        <input type="text" name="option_sort_order" id="sm-option-sort-order" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="sm-option-name">{{ omniva_int_m_label_sm_modal_name }}</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="option_name" id="sm-option-name" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ omniva_int_m_label_sm_modal_type }}</label>
+                    <div class="col-sm-10">
+                        <select name="option_type" class="form-control">
+                            <option value="0">{{ omniva_int_m_generic_none }}</option>
+                            {% for key, option in shipping_types %}
+                            <option value="{{ key }}">{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group sm-modal-global-price">
+                    <label class="col-sm-2 control-label">{{ omniva_int_m_label_sm_modal_price_type }}</label>
+                    <div class="col-sm-5">
+                        <select name="option_price_type" class="form-control">
+                            {% for key, option in price_types %}
+                            <option value="{{ key }}">{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <input type="text" name="option_price" class="form-control">
+                            <span class="input-group-addon option_price">&euro;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group sm-modal-global-price">
+                    <label class="col-sm-2 control-label">{{ omniva_int_m_label_sm_modal_free_shipping }}</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" name="option_free_shipping" class="form-control">
+                            <span class="input-group-addon">&euro;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group sm-modal-offer-global-priority">
+                    <label class="col-sm-2 control-label">{{ omniva_int_m_label_sm_modal_offer_priority }}</label>
+                    <div class="col-sm-10">
+                        {% for key, option in priority_types %}
+                        <label class="radio-inline">
+                            <div class="price-priority-wrapper">
+                                <input type="radio" name="option_price_priority" value="{{ key }}">{{ option }}
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group sm-modal-services-grid">
+                    <div class="col-sm-12">
+                        <div class="services-grid">
+                            <div class="available-services">
+                                <label>{{ omniva_int_m_label_sm_modal_available_services }}</label>
+                                <select multiple name="available_services" class="form-control">
+                                    {# {% for key, service_data in services_list %}
+                                        <option value="{{ key }}">{{ service_data.name }}</option>
+                                    {% endfor %} #}
+                                </select>
+                            </div>
+                            <div class="service-action">
+                                <button class="btn btn-default modal-select-service-btn" data-type="add" data-from="[name='available_services']" data-to="[name='selected_services']"></button>
+                                <button class="btn btn-default modal-select-service-btn" data-type="remove" data-from="[name='selected_services']" data-to="[name='available_services']"></button>
+                            </div>
+                            <div class="selected-services">
+                                <label>{{ omniva_int_m_label_sm_modal_selected_services }}</label>
+                                <select multiple name="selected_services" class="form-control">
+                                    {# {% for key, service_data in services_list %}
+                                        <option value="{{ key }}">{{ service_data.name }}</option>
+                                    {% endfor %} #}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group sm-modal-api-countries">
+                    <label class="col-xs-12 col-sm-2 control-label">{{ omniva_int_m_label_sm_modal_country }}</label>
+                    <div class="col-xs-10 col-sm-8 api-countries-select-wrapper">
+                        <select name="api_countries" class="form-control" style="width: 100%;">
+                            {% for option in countries %}
+                            <option value="{{ option.get('code') }}">{{ option.get('en_name') }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-xs-2 col-sm-2">
+                        <button class="btn btn-success sm-modal-add-country-btn">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group sm-modal-api-countries api-countries-table">
+                    <div class="col-sm-12 table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ omniva_int_m_sm_table_country }}</th>
+                                    <th>{{ omniva_int_m_sm_table_offer_priority }}</th>
+                                    <th>{{ omniva_int_m_sm_table_price }}</th>
+                                    <th>{{ omniva_int_m_sm_table_free_shipping }}</th>
+                                    <th>{{ omniva_int_m_sm_table_actions }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sm-modal-countries">
+                                <tr data-placeholder data-modal-no-country>
+                                    <td colspan="5">{{ omniva_int_m_sm_table_no_country }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-group text-center">
+                    <button id="save-add-shipping-method-btn" class="btn btn-default center">{{ omniva_int_m_generic_btn_save }}</button>
+                    <button id="cancel-add-shipping-method-btn" class="btn btn-default center">{{ omniva_int_m_generic_btn_cancel }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Parcel Defaults Edit Modal -->
+    <div class="omniva-int-m-modal hidden" id="parcel_default_modal">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title" id="parcel_default_modal_title">PLACEHOLDER</h3>
+            </div>
+            <div class="panel-body form-horizontal">
+                <input type="hidden" name="omniva_int_m_pd_category_id" id="modal-pd-category-id" value="{{ global_parcel_default.category_id }}">
+
+                <div class="alert alert-info"><i class="fa fa-exclamation-circle"></i>
+                    {{ omniva_int_m_help_parcel_defaults }}
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="modal-pd-hs-code">{{ omniva_int_m_label_pd_hs_code }}</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="omniva_int_m_pd_hs_code" value="{{ global_parcel_default.hs_code }}" id="modal-pd-hs-code" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="modal-pd-weight">{{ omniva_int_m_label_pd_weight }}</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" name="omniva_int_m_pd_weight" value="{{ global_parcel_default.weight }}" id="modal-pd-weight" class="form-control" />
+                            <span class="input-group-addon">kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group pd-dimensions">
+                    <label class="col-sm-2 control-label" for="modal-pd-length">{{ omniva_int_m_label_pd_dimensions }}</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <label class="col-sm-2 control-label" for="modal-pd-length">{{ omniva_int_m_label_pd_length }}</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="text" name="omniva_int_m_pd_length" value="{{ global_parcel_default.length }}" id="modal-pd-length" class="form-control" />
+                                    <span class="input-group-addon">cm</span>
+                                </div>
+                            </div>
+                            
+                            <label class="col-sm-2 control-label" for="modal-pd-width">{{ omniva_int_m_label_pd_width }}</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="text" name="omniva_int_m_pd_width" value="{{ global_parcel_default.width }}" id="modal-pd-width" class="form-control" />
+                                    <span class="input-group-addon">cm</span>
+                                </div>
+                            </div>
+
+                            <label class="col-sm-2 control-label" for="modal-pd-height">{{ omniva_int_m_label_pd_height }}</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="text" name="omniva_int_m_pd_height" value="{{ global_parcel_default.height }}" id="modal-pd-height" class="form-control" />
+                                    <span class="input-group-addon">cm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group text-center">
+                    <button id="save-parcel-default-btn" class="btn btn-default center">{{ omniva_int_m_generic_btn_save }}</button>
+                    <button id="cancel-parcel-default-btn" class="btn btn-default center">{{ omniva_int_m_generic_btn_cancel }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="omniva_int_m_loader">
+        <div class="bs5-spinner-border"></div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="view/javascript/omniva_int_m/select2.min.css">
+<link rel="stylesheet" href="view/javascript/omniva_int_m/select2_bs3.css">
+<link rel="stylesheet" href="view/javascript/omniva_int_m/admin.css">
+<script src="view/javascript/omniva_int_m/select2.min.js" defer></script>
+<script>
+var OMNIVA_INT_M_SETTINGS_DATA = {
+    shippingTypes: {{ shipping_types|json_encode() }},
+    servicesList: {{ services_list|json_encode() }},
+    globalParcelDefault: {{ global_parcel_default|json_encode() }},
+    url_ajax: '{{ ajax_url }}',
+    api_coutries: {{ countries|json_encode() }},
+    geo_zones: {{ geo_zones|json_encode() }},
+    priceTypes: {{ price_types|json_encode() }},
+    priceTypeAddons: {{ price_type_addons|json_encode() }},
+    pricePriorityType: {{ priority_types|json_encode() }}
+};
+</script>
+<script src="view/javascript/omniva_int_m/common.js"></script>
+<script src="view/javascript/omniva_int_m/settings.js"></script>
+{{ footer }} 

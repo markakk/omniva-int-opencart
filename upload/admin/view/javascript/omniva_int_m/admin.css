@@ -1,0 +1,168 @@
+body {
+    --loader-size: 5em;
+    --loader-weight: 0.5em;
+}
+
+#omniva_int_m_panel {
+    margin-bottom: 1.5em;
+}
+
+#omniva_int_m_panel.loading {
+    min-height: 7em;
+}
+
+.omniva_int_m_content select:invalid,
+.omniva_int_m_content input:invalid {
+    border-color: #e3503e;
+    -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+}
+
+.omniva_int_m_content button > i {
+    pointer-events: none;
+}
+
+.additional-services {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 1em;
+}
+
+.service-disabled::before {
+    content: '\2716';
+    color: #FF0000;
+    margin-right: 0.25em;
+}
+
+.service-enabled::before {
+    content: '\2713';
+    color: #008000;
+    margin-right: 0.25em;
+}
+
+.omniva-int-m-modal {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9;
+}
+
+.omniva-int-m-modal > .panel {
+    width: 100%;
+    max-width: 95%;
+    margin-top: 70px;
+}
+
+.omniva-int-m-modal > .panel > .panel-body {
+    max-height: 80vh;
+    overflow: auto;
+}
+
+.services-grid {
+    display: grid;
+    gap: 1em;
+    grid-template-columns: auto;
+}
+
+.service-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+}
+
+.service-action [data-type="add"]::after {
+    content: '\FE3E';
+}
+
+.service-action [data-type="remove"]::after {
+    content: '\FE3D';
+}
+
+.panel-heading.heading-shipping-method {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-priority-wrapper {
+    display: flex;
+    gap: 1em;
+}
+
+#sm-modal-countries tr {
+    --loader-size: 3em;
+    --loader-weight: 0.3em;
+}
+
+@keyframes bs5-spinner-border {
+    100% { transform: rotate(360deg) }
+}
+
+.loading {
+    position: relative;
+    overflow: hidden !important;
+}
+
+.omniva_int_m_loader {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.5);
+    color: #ff6601;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading > .omniva_int_m_loader {
+    display: flex;
+}
+
+.bs5-spinner-border {
+    display: inline-block;
+    width: var(--loader-size, 1em);
+    height: var(--loader-size, 1em);
+    border: var(--loader-weight, 0.15em) solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: .75s linear infinite bs5-spinner-border;
+    animation: 0.75s linear infinite bs5-spinner-border;
+}
+
+.options-hidden .sm-modal-services-grid,
+.options-hidden .sm-modal-global-price,
+.options-hidden .sm-modal-offer-global-priority,
+.options-hidden .sm-modal-api-countries,
+.sm-create .sm-modal-api-countries {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .omniva-int-m-modal {
+        margin-left: 235px
+    }
+    .services-grid {
+        grid-template-columns: 2fr 1fr 2fr;
+    }
+
+    .service-action {
+        margin-top: 1.2em;
+        flex-direction: column;
+    }
+
+    .service-action [data-type="add"]::after {
+        content: '\00BB';
+    }
+
+    .service-action [data-type="remove"]::after {
+        content: '\00AB';
+    }
+
+    .pd-dimensions .row > label {
+        display: none;
+    }
+}
