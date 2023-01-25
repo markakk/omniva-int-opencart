@@ -17,13 +17,16 @@
     <!-- Errors / Success -->
     <div class="container-fluid">
         {% if error_warning %}
-        <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <div class="alert alert-danger">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <i class="fa fa-exclamation-circle"></i>
+            {{ error_warning }}
         </div>
         {% endif %}
         {% if success %}
-        <div class="alert alert-success"><i class="fa fa-exclamation-circle"></i>
+        <div class="alert alert-success">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <i class="fa fa-exclamation-circle"></i>
             {{ success }}
         </div>
         {% endif %}
@@ -63,15 +66,6 @@
         <li><a href="#tab-services" data-toggle="tab">{{ omniva_int_m_tab_services }}</a></li>
         <li><a href="#tab-sender-info" data-toggle="tab">{{ omniva_int_m_tab_sender_info }}</a></li>
         <li><a href="#tab-parcel-defaults" data-toggle="tab">{{ omniva_int_m_tab_parcel_defaults }}</a></li>
-        {# {% if required_settings_set %}
-            <li><a href="#tab-price" data-toggle="tab">{{ omniva_int_m_tab_price }}</a></li>
-            <li><a href="#tab-cod" data-toggle="tab">{{ omniva_int_m_tab_cod }}</a></li>
-            <li><a href="#tab-terminals" data-toggle="tab">{{ omniva_int_m_tab_terminals }}</a></li>
-            <li><a href="#tab-tracking-email" data-toggle="tab">{{ omniva_int_m_tab_tracking_email }}</a></li>
-            <li class="hidden"><a href="#tab-advanced" data-toggle="tab">{{ omniva_int_m_tab_advanced }}</a></li>
-        {% else %}
-            <li><div class="alert alert-danger">{{ omniva_int_m_alert_settings }}</div></li>
-        {% endif %} #}
     </ul>
 
     <div class="tab-content">
@@ -173,6 +167,26 @@
                                     <select name="omniva_int_m_api_test_mode" id="input-api-test-mode" class="form-control">
                                         <option value="0">{{ omniva_int_m_generic_no }}</option>
                                         <option value="1" {% if omniva_int_m_api_test_mode == 1 %}selected{% endif %}>{{ omniva_int_m_generic_yes }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-api-consolidate-mode">{{ omniva_int_m_label_api_consolidate_mode }}</label>
+                                <div class="col-sm-10">
+                                    <select name="omniva_int_m_api_consolidate" id="input-api-consolidate-mode" class="form-control">
+                                        <option value="0">{{ omniva_int_m_generic_no }}</option>
+                                        <option value="1" {% if omniva_int_m_api_consolidate == 1 %}selected{% endif %}>{{ omniva_int_m_generic_yes }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-api-use-price-with-tax">{{ omniva_int_m_label_api_use_price_with_tax }}</label>
+                                <div class="col-sm-10">
+                                    <select name="omniva_int_m_api_use_vat_price" id="input-api-use-price-with-tax" class="form-control">
+                                        <option value="0">{{ omniva_int_m_generic_no }}</option>
+                                        <option value="1" {% if omniva_int_m_api_use_vat_price == 1 %}selected{% endif %}>{{ omniva_int_m_generic_yes }}</option>
                                     </select>
                                 </div>
                             </div>

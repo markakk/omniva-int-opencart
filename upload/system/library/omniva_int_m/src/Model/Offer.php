@@ -37,6 +37,7 @@ class Offer implements \JsonSerializable
     const DELIVERY_TIME = 'delivery_time';
     const PRICE = 'price';
     const PRICE_EXCL_VAT = 'total_price_excl_vat';
+    const PRICE_INCL_VAT = 'total_price_with_vat';
     const REMOTE_AREA_CHARGE = 'remote_area_charge';
     const PICKUP_FROM_ADDRESS = 'pickup_from_address';
     const DELIVERY_TO_ADDRESS = 'delivery_to_address';
@@ -89,10 +90,18 @@ class Offer implements \JsonSerializable
         return $obj;
     }
 
-    public function getPrice($add_to_price = 0.0, $addition_type = null)
+    public function getPrice($add_to_price = 0.0, $addition_type = null, $use_vat_price = false)
     {
+        if ($use_vat_price && !isset($this->data->{self::PRICE_INCL_VAT})) {
+            return null;
+        }
+
+        if (!$use_vat_price && !isset($this->data->{self::PRICE_EXCL_VAT})) {
+            return null;
+        }
+
         $add_to_price = (float) $add_to_price;
-        $offer_price = (float) $this->data->{self::PRICE_EXCL_VAT};
+        $offer_price = (float) ($use_vat_price ? $this->data->{self::PRICE_INCL_VAT} : $this->data->{self::PRICE_EXCL_VAT});
         $addition_type = (int) $addition_type;
 
         // nothing to add return as is

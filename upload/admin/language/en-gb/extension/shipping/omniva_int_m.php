@@ -101,6 +101,8 @@ $_['omniva_int_m_service_table_additional_services'] = 'Additional services';
 $_['omniva_int_m_title_api_settings'] = 'API settings';
 $_['omniva_int_m_label_api_token'] = 'API Token';
 $_['omniva_int_m_label_api_test_mode'] = 'Test Mode';
+$_['omniva_int_m_label_api_consolidate_mode'] = 'Consolidate mode';
+$_['omniva_int_m_label_api_use_price_with_tax'] = 'Use Price With Tax';
 
 // General Tab
 $_['omniva_int_m_title_edit'] = 'General settings';

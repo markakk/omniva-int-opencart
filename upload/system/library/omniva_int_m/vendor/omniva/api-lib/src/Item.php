@@ -13,10 +13,10 @@ class Item
     private $value;
     private $units;
     private $country_id;
+    private $hs_code;
 
     public function __construct()
     {
-
     }
 
     public function setDescription($description)
@@ -42,9 +42,16 @@ class Item
 
     public function setCountryId($country_id)
     {
-      $this->country_id = $country_id;
+        $this->country_id = $country_id;
 
-      return $this;
+        return $this;
+    }
+
+    public function setHsCode($hs_code)
+    {
+        $this->hs_code = $hs_code;
+
+        return $this;
     }
 
     public function generateItem()
@@ -57,7 +64,8 @@ class Item
             'description' => $this->description,
             'value' => $this->value,
             'units' => $this->units,
-            'country_id' => $this->country_id
+            'country_id' => $this->country_id,
+            'hs_code' => $this->hs_code ?? ''
         );
     }
 

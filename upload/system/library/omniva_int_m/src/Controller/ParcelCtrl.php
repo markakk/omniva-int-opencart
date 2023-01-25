@@ -3,6 +3,7 @@
 namespace Mijora\OmnivaIntOpencart\Controller;
 
 use Mijora\OmnivaIntOpencart\Helper;
+use Mijora\OmnivaIntOpencart\Params;
 use Mijora\OmnivaIntOpencart\Model\Country;
 use Mijora\OmnivaIntOpencart\Model\ParcelDefault;
 use OmnivaApi\Item;
@@ -17,38 +18,9 @@ class ParcelCtrl
         'height'
     ];
 
-    public static function makeParcelsFromCart($cart_products, $db, $weight_class = null, $length_class = null)
+    public static function makeParcelsFromCart($cart_products, $db, $weight_class = null, $length_class = null, $config = null)
     {
-        $product_ids = array_map(function ($product) {
-            return (int) $product['product_id'];
-        }, $cart_products);
-
-        $result = $db->query('
-            SELECT product_id, category_id FROM ' . DB_PREFIX . 'product_to_category 
-            WHERE product_id IN (' . implode(', ', $product_ids) . ')
-        ');
-
-        $product_categories = [];
-        $categories = [];
-        if ($result->rows) {
-            foreach ($result->rows as $row) {
-                $product_id = $row['product_id'];
-                $category_id = $row['category_id'];
-                if (!isset($product_categories[$product_id])) {
-                    $product_categories[$product_id] = [];
-                }
-
-                if (!isset($categories[$category_id])) {
-                    $categories[$category_id] = $category_id;
-                }
-
-                $product_categories[$product_id][] = $row['category_id'];
-            }
-        }
-
-        foreach ($product_categories as $product_id => $category_ids) {
-            $product_categories[$product_id] = ParcelDefault::getMultipleParcelDefault($category_ids, $db);
-        }
+        $product_categories = self::getProductCategoriesParcelDefaults($cart_products, $db);
 
         $defaults = ParcelDefault::getGlobalDefault($db);
 
@@ -59,6 +31,14 @@ class ParcelCtrl
         if (!$kg_weight_class_id) {
             return [];
         }
+
+        $consolidate = false;
+        if ($config) {
+            $consolidate = (bool) ($config->get(Params::PREFIX . 'api_consolidate') ?? false);
+        }
+
+        $total_weight = 0.0;
+        $total_volume = 0.0;
 
         $parcels = [];
         foreach ($cart_products as $product) {
@@ -100,19 +80,80 @@ class ParcelCtrl
                 $$dimmension = $$dimmension === 0 ? $defaults->$dimmension : $$dimmension;
             }
 
-            $parcel = (new Parcel())
-                ->setAmount((int) $product['quantity'])
-                ->setUnitWeight($weight)
-                ->setWidth(ceil($width))
-                ->setLength(ceil($length))
-                ->setHeight(ceil($height));
+            $total_weight += ($weight * (int) $product['quantity']);
+            $total_volume += (($width * $height * $length) * (int) $product['quantity']);
 
-            for ($i = 0; $i < (int) $product['quantity']; $i++) {
+            if (!$consolidate) {
+                $parcel = (new Parcel())
+                    ->setAmount((int) $product['quantity'])
+                    ->setUnitWeight($weight)
+                    ->setWidth(ceil($width))
+                    ->setLength(ceil($length))
+                    ->setHeight(ceil($height));
+
                 $parcels[] = $parcel->generateParcel();
             }
         }
 
+        if ($consolidate && $total_volume > 0) {
+            $consolidated_part = pow($total_volume, 1 / 3);
+            $parcel = (new Parcel())
+                ->setAmount(1)
+                ->setUnitWeight($total_weight)
+                ->setWidth(ceil($consolidated_part))
+                ->setLength(ceil($consolidated_part))
+                ->setHeight(ceil($consolidated_part));
+
+            $parcels = [
+                $parcel->generateParcel()
+            ];
+        }
+
         return $parcels;
+    }
+
+    /**
+     *
+     * @param array $cart_products
+     * @param object $db
+     * 
+     * @return array
+     * 
+     */
+    public static function getProductCategoriesParcelDefaults($cart_products, $db)
+    {
+        $product_ids = array_map(function ($product) {
+            return (int) $product['product_id'];
+        }, $cart_products);
+
+        $result = $db->query('
+            SELECT product_id, category_id FROM ' . DB_PREFIX . 'product_to_category 
+            WHERE product_id IN (' . implode(', ', $product_ids) . ')
+        ');
+
+        $product_categories = [];
+        $categories = [];
+        if ($result->rows) {
+            foreach ($result->rows as $row) {
+                $product_id = $row['product_id'];
+                $category_id = $row['category_id'];
+                if (!isset($product_categories[$product_id])) {
+                    $product_categories[$product_id] = [];
+                }
+
+                if (!isset($categories[$category_id])) {
+                    $categories[$category_id] = $category_id;
+                }
+
+                $product_categories[$product_id][] = $row['category_id'];
+            }
+        }
+
+        foreach ($product_categories as $product_id => $category_ids) {
+            $product_categories[$product_id] = ParcelDefault::getMultipleParcelDefault($category_ids, $db);
+        }
+
+        return $product_categories;
     }
 
     public static function getProductsDataByOrder($order_id, $db)
@@ -161,18 +202,33 @@ class ParcelCtrl
         return $products;
     }
 
-    public static function makeItemsFromProducts($products, $country)
+    public static function makeItemsFromProducts($products, $country, $db)
     {
         $items = [];
+        $global_default = ParcelDefault::getGlobalDefault($db);
+
+        $product_categories_defaults = self::getProductCategoriesParcelDefaults($products, $db);
 
         foreach ($products as $product) {
+            $hs_code = $global_default->hs_code ?? null;
+
+            // find custom hs_code - first non empty value is used
+            if (isset($product_categories_defaults[$product['product_id']])) {
+                foreach ($product_categories_defaults[$product['product_id']] as $category_id => $parcel_default) {
+                    if ($parcel_default->hs_code) {
+                        $hs_code = $parcel_default->hs_code;
+                        break;
+                    }
+                }
+            }
+
             $item = new Item();
             $item
                 ->setDescription($product['name'])
                 ->setItemPrice((float) $product['price'])
                 ->setItemAmount((int) $product['quantity'])
-                ->setCountryId($country->get(Country::ID))
-            ;
+                ->setHsCode($hs_code ? $hs_code : '')
+                ->setCountryId($country->get(Country::ID));
 
             $items[] = $item->generateItem();
         }

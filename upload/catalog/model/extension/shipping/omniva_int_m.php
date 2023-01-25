@@ -81,9 +81,12 @@ class ModelExtensionShippingOmnivaIntM extends Model
         }
 
         $products = $this->cart->getProducts();
-        $parcels = ParcelCtrl::makeParcelsFromCart($products, $this->db, $this->weight, $this->length);
+        $parcels = ParcelCtrl::makeParcelsFromCart($products, $this->db, $this->weight, $this->length, $this->config);
 
-        $offers = OfferApi::getOffers($sender, $receiver, $parcels, 0); // passing 0 so its not sorted
+        $use_offer_price_with_tax = (bool) $this->config->get(Params::PREFIX . 'api_use_vat_price');
+
+        // passing 0 as sorting param so its not sorted
+        $offers = OfferApi::getOffers($sender, $receiver, $parcels, 0, ($use_offer_price_with_tax ? Offer::PRICE_INCL_VAT : Offer::PRICE_EXCL_VAT));
         $offer = $offers[0] ?? null;
 
         $method_data = array();
@@ -146,7 +149,7 @@ class ModelExtensionShippingOmnivaIntM extends Model
             // we want only first one from list
             $offer = $option_offers[0];
 
-            $cost = (float) $offer->getPrice($price, $price_type);
+            $cost = (float) $offer->getPrice($price, $price_type, $use_offer_price_with_tax);
 
             // set 0 cost if free shipping enabled and subtotal is higher
             if ($free_shipping !== null && (float) $free_shipping <= $sub_total_eur) {

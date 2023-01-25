@@ -322,7 +322,7 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
             // general tab
             'tax_class_id', 'geo_zone_id',
             // api tab
-            'api_token', 'api_test_mode',
+            'api_token', 'api_test_mode', 'api_consolidate', 'api_use_vat_price',
             // sender-info tab
             'sender_name', 'sender_street', 'sender_postcode',
             'sender_city', 'sender_country', 'sender_phone', 'sender_email',
@@ -376,6 +376,11 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
         $data['omniva_int_shipping_options'] = $this->load->view('extension/shipping/omniva_int_m/shipping_options_partial', $partial_data);
 
         $data['services'] = Helper::getServices($this->session);
+
+        if (is_string($data['services'])) {
+            $data['error_warning'] .= '<br>' . $data['services'];
+            $data['services'] = [];
+        }
 
         $data['countries'] = Country::getAllCountries($this->db);
 
@@ -958,9 +963,9 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
         $data['products'] = $order_products;
         $data['order'] = $this->model_sale_order->getOrder($order_id);
 
-        $data['parcels'] = ParcelCtrl::makeParcelsFromCart($order_products, $this->db, $this->weight, $this->length);
+        $data['parcels'] = ParcelCtrl::makeParcelsFromCart($order_products, $this->db, $this->weight, $this->length, $this->config);
         $country = new Country($data['order']['shipping_iso_code_2'], $this->db);
-        $data['items'] = ParcelCtrl::makeItemsFromProducts($order_products, $country);
+        // $data['items'] = ParcelCtrl::makeItemsFromProducts($order_products, $country, $this->db);
 
         $data['shipment_status'] = 'Shipment has yet to be registered';
 
@@ -996,7 +1001,7 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
                 $order_products[$key] = $product;
             }
 
-            $data['parcels'] = ParcelCtrl::makeParcelsFromCart($order_products, $this->db, $this->weight, $this->length);
+            $data['parcels'] = ParcelCtrl::makeParcelsFromCart($order_products, $this->db, $this->weight, $this->length, $this->config);
 
             if ($data['api_data']) {
                 try {
@@ -1115,8 +1120,8 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
             $order['omniva_int_m_hs_code'] = $parcel_default->hs_code;
 
 
-            $parcels = ParcelCtrl::makeParcelsFromCart($order_products, $this->db, $this->weight, $this->length);
-            $items = ParcelCtrl::makeItemsFromProducts($order_products, $country);
+            $parcels = ParcelCtrl::makeParcelsFromCart($order_products, $this->db, $this->weight, $this->length, $this->config);
+            $items = ParcelCtrl::makeItemsFromProducts($order_products, $country, $this->db);
 
             $option_id = str_replace('omniva_int_m.', '', $order['shipping_code']);
             $option_id = explode('_', $option_id)[1];
