@@ -67,6 +67,10 @@ class ModelExtensionShippingOmnivaIntM extends Model
 
         $sender = Helper::getSender($this->config, $this->db);
 
+        if (!$sender) {
+            return [];
+        }
+
         $country_receiver = new Country($receiver_country, $this->db);
         $receiver = new Receiver(false);
         $receiver

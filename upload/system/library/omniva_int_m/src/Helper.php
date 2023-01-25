@@ -241,14 +241,18 @@ class Helper
         $country_sender = new Country($config->get(Params::PREFIX . 'sender_country'), $db);
 
         $sender = new Sender();
-        $sender
-            ->setCompanyName($config->get(Params::PREFIX . 'sender_name'))
-            ->setContactName($config->get(Params::PREFIX . 'sender_name'))
-            ->setStreetName($config->get(Params::PREFIX . 'sender_street'))
-            ->setZipcode($config->get(Params::PREFIX . 'sender_postcode'))
-            ->setCity($config->get(Params::PREFIX . 'sender_city'))
-            ->setPhoneNumber($config->get(Params::PREFIX . 'sender_phone'))
-            ->setCountryId($country_sender->get(Country::ID));
+        try {
+            $sender
+                ->setCompanyName($config->get(Params::PREFIX . 'sender_name'))
+                ->setContactName($config->get(Params::PREFIX . 'sender_name'))
+                ->setStreetName($config->get(Params::PREFIX . 'sender_street'))
+                ->setZipcode($config->get(Params::PREFIX . 'sender_postcode'))
+                ->setCity($config->get(Params::PREFIX . 'sender_city'))
+                ->setPhoneNumber($config->get(Params::PREFIX . 'sender_phone'))
+                ->setCountryId($country_sender->get(Country::ID));
+        } catch (\Throwable $th) {
+            return null;
+        }
 
         return $sender;
     }
