@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0] - Consolidate
+- Added Support for OpenCart 2.3
+- Improved HS Code registering
+- Added new API setting Consolidate Mode - if set to yes all cart products will be merged as one parcel for offers
+- Added new API setting Use Price With Tax - if set to yes price calculation will be done with offer price with tax (if configured opencart VAT will be added on top)
+
 ## [1.0.3] - Missing template fix
 - Fixed missing checkout_partial.twig template
 
