@@ -80,7 +80,9 @@ class ParcelCtrl
                 $$dimmension = $$dimmension === 0 ? $defaults->$dimmension : $$dimmension;
             }
 
-            $total_weight += ($weight * (int) $product['quantity']);
+            // Product from cart has total products weight so no need to multiply by quantity
+            $total_weight += $weight;
+
             $total_volume += (($width * $height * $length) * (int) $product['quantity']);
 
             if (!$consolidate) {

@@ -25,6 +25,8 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
         'tracking-email', 'advanced'
     ];
 
+    private $omniva_m_translations = [];
+
     public function install()
     {
         $sql_array = [
@@ -198,7 +200,8 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
 
     public function index()
     {
-        $this->load->language('extension/shipping/omniva_int_m');
+        $this->omniva_m_translations = $this->load->language('extension/shipping/omniva_int_m');
+        $data = $this->mergeTranslationsIntoData([]);
 
         $this->document->setTitle($this->language->get('heading_title'));
 
@@ -369,10 +372,10 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
         // Load dynamic strings
         $data['dynamic_strings'] = $this->getDynamicStrings();
 
-        $partial_data = [
+        $partial_data = $this->mergeTranslationsIntoData([
             'omniva_int_options' => ShippingOption::getShippingOptions($this->db),
             'dynamic_strings' => $data['dynamic_strings']
-        ];
+        ]);
         $data['omniva_int_shipping_options'] = $this->load->view('extension/shipping/omniva_int_m/shipping_options_partial', $partial_data);
 
         $data['services'] = Helper::getServices($this->session);
@@ -498,7 +501,8 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
 
     public function ajax()
     {
-        $this->load->language('extension/shipping/omniva_int_m');
+        $this->omniva_m_translations = $this->load->language('extension/shipping/omniva_int_m');
+
         if (!$this->validate()) {
             echo json_encode($this->error);
             exit();
@@ -686,13 +690,14 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
 
     private function getShippingOptionList()
     {
+        $template_data = $this->mergeTranslationsIntoData([
+            'dynamic_strings' => $this->getDynamicStrings(),
+            'omniva_int_options' => ShippingOption::getShippingOptions($this->db)
+        ]);
         return [
             'shipping_options' => $this->load->view(
                 'extension/shipping/omniva_int_m/shipping_options_partial',
-                [
-                    'dynamic_strings' => $this->getDynamicStrings(),
-                    'omniva_int_options' => ShippingOption::getShippingOptions($this->db)
-                ]
+                $template_data
             )
         ];
     }
@@ -879,7 +884,7 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
             'limit' => $page_limit
         );
 
-        $partial_data = [];
+        $partial_data = $this->mergeTranslationsIntoData([]);
         $partial_data['omniva_int_m_categories'] = $this->model_catalog_category->getCategories($filter_data);
 
         $this->associateWithParcelDefault($partial_data['omniva_int_m_categories']);
@@ -931,7 +936,7 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
 
         $order_id =  (int) $this->request->post['order_id'];
 
-        $data = [];
+        $data = $this->mergeTranslationsIntoData([]);
 
         $data['order_id'] = $order_id;
 
@@ -1219,12 +1224,23 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
         ];
     }
 
+    private function mergeTranslationsIntoData($data)
+    {
+        // in opencart 3.0+ translations are merged automatically
+        if (version_compare(VERSION, '3.0.0', '>=')) {
+            return $data;
+        }
+
+        return array_merge($data, $this->omniva_m_translations);
+    }
+
     /**
      * MANIFEST PAGE
      */
     public function manifest()
     {
-        $this->load->language('extension/shipping/omniva_int_m');
+        $this->omniva_m_translations = $this->load->language('extension/shipping/omniva_int_m');
+        $data = $this->mergeTranslationsIntoData([]);
 
         $this->document->setTitle($this->language->get(Params::PREFIX . 'manifest_page_title'));
 
@@ -1285,10 +1301,10 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
         }
 
         $offset = ($page - 1) * $page_limit;
-        $data = [
-            'manifests' => ManifestCtrl::list($this->db, $offset, $page_limit)
-        ];
 
+        $data = $this->mergeTranslationsIntoData([
+            'manifests' => ManifestCtrl::list($this->db, $offset, $page_limit)
+        ]);
 
         $data['paginator'] = '';
         if ($total_pages > 1) {

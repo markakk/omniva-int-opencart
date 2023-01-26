@@ -145,7 +145,6 @@ class ModelExtensionShippingOmnivaIntM extends Model
 
             $option_offers = array_values($option_offers);
 
-
             if (empty($option_offers)) {
                 continue;
             }
