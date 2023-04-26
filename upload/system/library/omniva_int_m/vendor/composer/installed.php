@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'a79d4871d96871d619d254b0d7a3edf0b46fea12',
+        'reference' => '1452a9b52ec9832a04507fb7adc0f596746c4429',
         'name' => '__root__',
         'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'a79d4871d96871d619d254b0d7a3edf0b46fea12',
+            'reference' => '1452a9b52ec9832a04507fb7adc0f596746c4429',
             'dev_requirement' => false,
         ),
         'omniva/api-lib' => array(
@@ -27,7 +27,7 @@
             'aliases' => array(
                 0 => '9999999-dev',
             ),
-            'reference' => '9fa2a5f207161ef9e033eea2eba76952423dca55',
+            'reference' => '3965f82ee86a5a1841eb221220a6a14f164b9302',
             'dev_requirement' => false,
         ),
     ),

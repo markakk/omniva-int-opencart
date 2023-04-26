@@ -1,6 +1,6 @@
  # OmnivaApi API-lib
 
-Its a library for OmnivaApi API.
+Its a library for International Omniva shipments.
 
 ## Using OmnivaApi API-lib
 - ```__PATH_TO_LIB__``` is a path where OmnivaApi API is placed. This will load OmnivaApi namespace
@@ -97,7 +97,7 @@ Minimum required setup:
 ```php
 use OmnivaApi\Parcel;
 
-$parcel = new Parcel();=
+$parcel = new Parcel();
 $parcel
     ->setAmount(2)
     ->setUnitWeight(1)
@@ -113,24 +113,24 @@ $parcel
 Minimum required setup:
 
 ```php
-// apacioje du zemiau use istrinti ir naudoti use OmnivaApi\Item;
 use OmnivaApi\Item;
-use OmnivaApi\Sender;
 
 $item = new Item();
 $item
   ->setDescription('description')
   ->setItemPrice(5)
-  ->setItemAmount(1)
+  ->setItemAmount(1);
 ```
 
+Some carriers do not allow to register a shipment when the item is free, so when receive an item price of 0.00, it is converted to 0.01. If want to use the price 0.00 for the item, then before specifying the price, need to change the value of the `allow_free` parameter to true.
+```php
+$item->setAllowFree(true);
+```
 
 ## Creating Order
 ---
 
 ```php
-// API use nera panaudotas - galima istrinti
-use OmnivaApi\API;
 use OmnivaApi\Sender;
 use OmnivaApi\Receiver;
 use OmnivaApi\Item;
@@ -183,7 +183,8 @@ $item1
 $item2 = new Item();
 $item2
     ->setDescription('test package')
-    ->setItemPrice(1)
+    ->setAllowFree(true)
+    ->setItemPrice(0)
     ->setItemAmount(3);
 
 $items = array($item1, $item2);
