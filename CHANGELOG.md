@@ -1,5 +1,8 @@
 # Changelog
 
+## [Unreleased]
+- Updated Omniva API library
+
 ## [1.1.0] - Consolidate
 - Added Support for OpenCart 2.3
 - Improved HS Code registering
