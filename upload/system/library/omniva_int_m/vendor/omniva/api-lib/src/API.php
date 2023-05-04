@@ -10,7 +10,7 @@ class API
     protected $url = "https://tarptautines.omniva.lt/api/v1/";
     protected $token;
     private $debug_mode;
-    private $timeout = 5;
+    private $timeout = 30;
 
     public function __construct($token = false, $test_mode = false, $api_debug_mode = false)
     {
@@ -113,6 +113,10 @@ class API
         if ($httpCode == 401) {
             // galetu buti tikslesnis exception - Siusk24NotAuthorizedException
             throw new OmnivaApiException(implode(" \n", json_decode($response)->errors));
+        }
+
+        if ($httpCode == 502) {
+            throw new OmnivaApiException('API got error:<br><br>' . 'errors in ' . debug_backtrace()[2]['function'] . '():<br><br>' . 'Unable to connect to server');
         }
 
         if (isset($respObj['errors']) && $respObj['errors']) {

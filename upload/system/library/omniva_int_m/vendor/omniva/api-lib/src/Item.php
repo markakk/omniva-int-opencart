@@ -13,10 +13,11 @@ class Item
     private $value;
     private $units;
     private $country_id;
-    private $hs_code;
+    private $allow_free = false;
 
     public function __construct()
     {
+
     }
 
     public function setDescription($description)
@@ -28,7 +29,17 @@ class Item
 
     public function setItemPrice($value)
     {
+        if ( (float)$value < 0.01 && ! $this->allow_free ) {
+            $value = 0.01;
+        }
         $this->value = $value;
+
+        return $this;
+    }
+
+    public function setAllowFree($allow)
+    {
+        $this->allow_free = $allow;
 
         return $this;
     }
@@ -42,30 +53,28 @@ class Item
 
     public function setCountryId($country_id)
     {
-        $this->country_id = $country_id;
+      $this->country_id = $country_id;
 
-        return $this;
-    }
-
-    public function setHsCode($hs_code)
-    {
-        $this->hs_code = $hs_code;
-
-        return $this;
+      return $this;
     }
 
     public function generateItem()
     {
-        if (!$this->description) throw new OmnivaApiException('All the fields must be filled. description is missing.');
-        if (!$this->value) throw new OmnivaApiException('All the fields must be filled. value is missing.');
-        if (!$this->units) throw new OmnivaApiException('All the fields must be filled. units is missing.');
-        if (!$this->country_id) throw new OmnivaApiException('All the fields must be filled. country_id is missing.');
+        if (!$this->description) throw new OmnivaApiException('All the fields must be filled. Item description is missing.');
+        if (!$this->value) {
+            if (is_numeric($this->value) && !$this->allow_free) {
+                throw new OmnivaApiException('It is not allowed to register a item with a price of 0.00');
+            } elseif (!is_numeric($this->value)) {
+                throw new OmnivaApiException('All the fields must be filled. Item value is missing.');
+            }
+        }
+        if (!$this->units) throw new OmnivaApiException('All the fields must be filled. Item units is missing.');
+        if (!$this->country_id) throw new OmnivaApiException('All the fields must be filled. Item country_id is missing.');
         return array(
             'description' => $this->description,
             'value' => $this->value,
             'units' => $this->units,
-            'country_id' => $this->country_id,
-            'hs_code' => $this->hs_code ?? ''
+            'country_id' => $this->country_id
         );
     }
 
