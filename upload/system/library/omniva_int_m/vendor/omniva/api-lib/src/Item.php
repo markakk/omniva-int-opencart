@@ -13,6 +13,7 @@ class Item
     private $value;
     private $units;
     private $country_id;
+    private $hs_code;
     private $allow_free = false;
 
     public function __construct()
@@ -58,6 +59,13 @@ class Item
       return $this;
     }
 
+    public function setHsCode($hs_code)
+    {
+        $this->hs_code = $hs_code;
+
+        return $this;
+    }
+
     public function generateItem()
     {
         if (!$this->description) throw new OmnivaApiException('All the fields must be filled. Item description is missing.');
@@ -74,7 +82,8 @@ class Item
             'description' => $this->description,
             'value' => $this->value,
             'units' => $this->units,
-            'country_id' => $this->country_id
+            'country_id' => $this->country_id,
+            'hs_code' => $this->hs_code ?? ''
         );
     }
 
