@@ -72,6 +72,7 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
                 `offer_data` text,
                 `terminal_id` varchar(200) DEFAULT NULL,
                 `terminal_data` text,
+                `insurance` tinyint(1) DEFAULT 0,
                 `added_at` datetime DEFAULT NULL,
                 `updated_at` datetime DEFAULT NULL,
                 PRIMARY KEY (`order_id`)
@@ -566,6 +567,9 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
             case 'updateSelectedTerminal':
                 echo json_encode(['data' => $this->updateSelectedTerminal()]);
                 exit();
+            case 'updateInsurance':
+                echo json_encode(['data' => $this->updateInsurance()]);
+                exit();
 
             default:
                 die($restricted);
@@ -949,6 +953,7 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
         }
 
         $data['offer'] = Helper::base64Decode($order_data['offer_data'], false);
+        $data['is_insurance'] = (bool) (isset($order_data['insurance']) ? $order_data['insurance'] : false);
         $data['is_terminal'] = (bool) $data['offer']['parcel_terminal_type'];
 
         $data['terminal_data'] = Helper::base64Decode($order_data['terminal_data'], false);
@@ -1035,7 +1040,7 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
                 'error' => 'An error occured while trying to generate Omniva International panel: ' . $th->getMessage()
             ];
         }
-
+        $result['offerData'] = isset($data['offer']) ? $data['offer'] : null;
         $result['panelHtml'] = $this->load->view('extension/shipping/omniva_int_m/order_panel', $data);
         return $result;
     }
@@ -1145,6 +1150,17 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
                 ->setReference($order_id)
                 ->setParcels($parcels)
                 ->setItems($items);
+
+            $additional_services = [];
+
+            $is_insurance = (bool) (isset($order_offer['insurance']) ? $order_offer['insurance'] : false);
+            if ($is_insurance) {
+                $additional_services[] = 'insurance';
+            }
+
+            if ($additional_services) {
+                $api_order->setAdditionalServices($additional_services);
+            }
 
             Helper::setApiStaticToken($this->config);
             $api = Helper::getApiInstance();
@@ -1425,6 +1441,42 @@ class ControllerExtensionShippingOmnivaIntM extends Controller
             ");
             return [
                 'result' => $result
+            ];
+        } catch (\Exception $th) {
+            return [
+                'error' => $th->getMessage()
+            ];
+        }
+    }
+
+    private function updateInsurance()
+    {
+        $is_insurance = (bool) (isset($this->request->post['insurance']) ? $this->request->post['insurance'] : false);
+        $order_id = isset($this->request->post['order_id']) ? $this->request->post['order_id'] : null;
+
+        if (!$order_id) {
+            return [
+                'error' => 'Order ID missing'
+            ];
+        }
+
+        $insurance_status = $is_insurance ? $this->language->get(Params::PREFIX . 'generic_enabled') : $this->language->get(Params::PREFIX . 'generic_disabled');
+
+        try {
+            $result = $this->db->query("
+                UPDATE " . DB_PREFIX . "omniva_int_m_order
+                SET
+                    insurance = " . (int) $is_insurance . "
+                WHERE order_id = '" . (int) $order_id . "'
+            ");
+            return [
+                'result' => $this->language->get(Params::PREFIX . 'panel_ajax_insurance_saved') . ' ' . $insurance_status,
+                'sql' => "
+                    UPDATE " . DB_PREFIX . "omniva_int_m_order
+                    SET
+                        insurance = " . (int) $is_insurance . "
+                    WHERE order_id = '" . (int) $order_id . "'
+                "
             ];
         } catch (\Exception $th) {
             return [

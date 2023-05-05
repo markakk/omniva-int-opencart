@@ -359,6 +359,56 @@ var OMNIVA_INT_M_ORDER = {
                 OMNIVA_INT_M_COMMON.showLoadingOverlay(false, OMNIVA_INT_M_ORDER.wrapper);
                 selectorWrapper.remove();
             });
+    },
+
+    saveInsurance: function () {
+        console.log('Saving insurance');
+        OMNIVA_INT_M_COMMON.showLoadingOverlay(true, OMNIVA_INT_M_ORDER.wrapper);
+
+        const insuranceCheckbox = OMNIVA_INT_M_ORDER.wrapper.querySelector(`input[name="insurance"]`);
+
+        const formData = new FormData();
+        formData.set('order_id', OMNIVA_INT_M_ORDER_DATA.order_id);
+        formData.set('insurance', (insuranceCheckbox && insuranceCheckbox.checked ? 1 : 0));
+
+        fetch(OMNIVA_INT_M_ORDER_DATA.ajax + '&action=updateInsurance', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(json => {
+                console.log(json);
+
+                if (!json.data) {
+                    if (json.warning) {
+                        OMNIVA_INT_M_COMMON.alert({
+                            message: json.warning
+                        });
+                        return;
+                    }
+                    return;
+                }
+
+                if (json.data.error) {
+                    OMNIVA_INT_M_COMMON.alert({
+                        message: json.data.error
+                    });
+                    return;
+                }
+
+                if (json.data?.result) {
+                    OMNIVA_INT_M_COMMON.alert({
+                        message: json.data.result
+                    });
+                } else {
+                    OMNIVA_INT_M_COMMON.alert({
+                        message: 'Something went wrong while saving terminal information'
+                    });
+                }
+            })
+            .finally(() => {
+                OMNIVA_INT_M_COMMON.showLoadingOverlay(false, OMNIVA_INT_M_ORDER.wrapper);
+            });
     }
 }
 

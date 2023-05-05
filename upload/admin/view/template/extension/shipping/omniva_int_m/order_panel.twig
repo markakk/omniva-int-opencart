@@ -13,6 +13,26 @@
                     <pre>{{ shipment_status }}</pre>
                 </div>
             </div>
+            
+            <div class="form-group">
+                <label class="col-sm-4 control-label">{{ omniva_int_m_panel_label_service }}</label>
+                <div class="col-sm-8">
+                    <pre>[ {{ offer.service_code }} ] {{ offer.name }}</pre>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-sm-4 control-label" for="insurance-input">{{ omniva_int_m_panel_label_insurance }}</label>
+                <div class="col-sm-8">
+                    <label class="omniva-toggle">
+                        <input type="checkbox" name="insurance" id="insurance-input"
+                            onchange="OMNIVA_INT_M_ORDER.saveInsurance(); return false;"
+                            {% if is_insurance %}checked="checked"{% endif %}
+                            {% if api_data or not offer.additional_services.insurance %}disabled{% endif %}
+                        />
+                    </label>
+                </div>
+            </div>
 
             {% if api_data %}
                 <div class="form-group">

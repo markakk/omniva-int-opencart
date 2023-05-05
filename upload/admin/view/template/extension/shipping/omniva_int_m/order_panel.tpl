@@ -14,6 +14,32 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><?php echo $omniva_int_m_panel_label_service; ?></label>
+                <div class="col-sm-8">
+                    <pre>[ <?php echo $offer['service_code']; ?> ] <?php echo $offer['name']; ?></pre>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-sm-4 control-label" for="insurance-input"><?php echo $omniva_int_m_panel_label_insurance; ?></label>
+                <div class="col-sm-8">
+                    <label class="omniva-toggle">
+                        <input type="checkbox" name="insurance" id="insurance-input"
+                            onchange="OMNIVA_INT_M_ORDER.saveInsurance(); return false;"
+                            
+                            <?php if ($is_insurance): ?>
+                                checked="checked"
+                            <?php endif; ?>
+
+                            <?php if ($api_data || !$offer['additional_services']['insurance']): ?>
+                                disabled
+                            <?php endif; ?>
+                        />
+                    </label>
+                </div>
+            </div>
+
             <?php if ($api_data): ?>
                 <div class="form-group">
                     <label class="col-sm-4 control-label"><?php echo $omniva_int_m_panel_label_manifest_id; ?></label>
