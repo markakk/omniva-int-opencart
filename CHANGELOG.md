@@ -1,7 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [1.2.0]
 - Updated Omniva API library
+- Added insurance service support (must be toggled manually in order) for services that support it
 
 ## [1.1.0] - Consolidate
 - Added Support for OpenCart 2.3
