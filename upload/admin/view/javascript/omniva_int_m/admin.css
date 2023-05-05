@@ -1,6 +1,11 @@
 body {
     --loader-size: 5em;
     --loader-weight: 0.5em;
+    --omniva-toggle-transition-timing: 400ms;
+    --omniva-toggle-color-on: #ff6600;
+    --omniva-toggle-color-off: #ccc;
+    --omniva-toggle-color-on-disabled: rgba(250, 102, 0, 0.5);
+    --omniva-toggle-color-off-disabled: rgba(204, 204, 204, 0.5);
 }
 
 #omniva_int_m_panel {
@@ -112,7 +117,7 @@ body {
     position: absolute;
     inset: 0;
     background-color: rgba(0,0,0,0.5);
-    color: #ff6601;
+    color: #ff6600;
     z-index: 999;
     align-items: center;
     justify-content: center;
@@ -165,4 +170,58 @@ body {
     .pd-dimensions .row > label {
         display: none;
     }
+}
+
+/* omniva toggle css */
+.omniva-toggle {
+    position: relative;
+}
+
+.omniva-toggle input[type="checkbox"] {
+    width: 53px;
+    height: 29px;
+    padding: 3px;
+    background-color: var(--omniva-toggle-color-off);
+    -webkit-transition: background-color var(--omniva-toggle-transition-timing);
+    transition: background-color var(--omniva-toggle-transition-timing);
+    border: none;
+    border-radius: 34px;
+    cursor: pointer;
+}
+
+.omniva-toggle input[type="checkbox"]:disabled {
+    --omniva-toggle-color-off: var(--omniva-toggle-color-off-disabled);
+    --omniva-toggle-color-on: var(--omniva-toggle-color-on-disabled);
+    cursor: not-allowed;
+}
+
+.omniva-toggle input[type="checkbox"]::before {
+    position: absolute;
+    content: "";
+    height: 23px;
+    width: 23px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    -webkit-transition: transform var(--omniva-toggle-transition-timing);
+    transition: transform var(--omniva-toggle-transition-timing);
+    border: 1px solid #fff;
+    border-radius: 50%;
+}
+
+.omniva-toggle input[type="checkbox"]::after {
+    display: none !important;
+}
+
+.omniva-toggle input[type="checkbox"]:checked {
+    background-color: var(--omniva-toggle-color-on);
+}
+
+.omniva-toggle input[type="checkbox"]:focus {
+    box-shadow: 0 0 1px var(--omniva-toggle-color-on);
+}
+
+.omniva-toggle input[type="checkbox"]:checked::before {
+    -webkit-transform: translateX(24px);
+    transform: translateX(24px)
 }
