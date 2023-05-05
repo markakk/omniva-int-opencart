@@ -346,6 +346,24 @@ class Helper
             }
         }
 
+        // module v1.2.0 new column
+        $module_order_table = $db->query("DESCRIBE `" . DB_PREFIX . Params::PREFIX . "order`")->rows;
+        $has_insurance_col = false;
+        foreach ($module_order_table as $col) {
+            if (strtolower($col['Field']) === 'insurance') {
+                $has_insurance_col = true;
+                break;
+            }
+        }
+
+        if (!$has_insurance_col) {
+            $result[Params::PREFIX . 'order'] = "
+                ALTER TABLE `" . DB_PREFIX . Params::PREFIX . "order`
+                ADD COLUMN `insurance` TINYINT(1) DEFAULT 0 
+                AFTER `terminal_data`;
+            ";
+        }
+
         return $result;
     }
 }

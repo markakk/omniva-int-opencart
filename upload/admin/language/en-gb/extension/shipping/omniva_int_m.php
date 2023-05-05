@@ -196,6 +196,8 @@ $_['omniva_int_m_panel_title'] = 'Omniva International';
 $_['omniva_int_m_panel_label_status'] = 'Status:';
 $_['omniva_int_m_panel_label_manifest_id'] = 'Registered in Manifest:';
 $_['omniva_int_m_panel_label_shipment_id'] = 'Shipment ID:';
+$_['omniva_int_m_panel_label_insurance'] = 'Insurance:';
+$_['omniva_int_m_panel_label_service'] = 'Service:';
 $_['omniva_int_m_panel_btn_get_label'] = 'Get Label';
 $_['omniva_int_m_panel_btn_check_status'] = 'Check Status';
 $_['omniva_int_m_panel_btn_cancel_shipment'] = 'Cancel Shipment';
@@ -211,6 +213,7 @@ $_['omniva_int_m_panel_table_col_length'] = 'Length';
 $_['omniva_int_m_panel_table_col_height'] = 'Height';
 $_['omniva_int_m_panel_warning_cancel'] = 'Cancel shipment?';
 $_['omniva_int_m_panel_warning_select_terminal'] = 'Please select terminal!';
+$_['omniva_int_m_panel_ajax_insurance_saved'] = 'Insurance selection updated:';
 
 
 // MANIFEST PAGE manifest_page_title
